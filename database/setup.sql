@@ -1,4 +1,4 @@
--- Creates everything from scratch. Run with:  mysql -u root -p < database/setup.sql
+-- Creates everything from scratch. Run with:  mysql -u zarak -p < database/setup.sql
 DROP DATABASE IF EXISTS filmrecension;
 CREATE DATABASE filmrecension CHARACTER SET utf8mb4;
 USE filmrecension;
@@ -12,7 +12,7 @@ CREATE TABLE users (
 CREATE TABLE movies (
   id INT AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
-  genre VARCHAR(100),
+  genre VARCHAR(100),npm
   release_year INT
 );
 
