@@ -1,6 +1,19 @@
-// Read "Authorization: Bearer <token>", verify with jwt.verify and process.env.JWT_SECRET,
-// set req.user = { id }, call next(). Respond 401 if missing/invalid.
+const jwt = require('jsonwebtoken');
+
+// Reads "Authorization: Bearer <token>", verifies it, and sets req.user.
 module.exports = function authenticate(req, res, next) {
-  // TODO
-  next();
+  const header = req.headers.authorization || '';
+  const [scheme, token] = header.split(' ');
+
+  if (scheme !== 'Bearer' || !token) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = { id: payload.id }; // the ONLY trusted source of the user's id
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
 };
