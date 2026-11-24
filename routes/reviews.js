@@ -24,4 +24,47 @@ router.get('/movies/:movieId/reviews', async (req, res, next) => {
   }
 });
 
+// Shared validation for POST and PUT. Returns an error string or null.
+function validateReviewBody(rating, comment) {
+  if (!Number.isInteger(rating) || rating < 1 || rating > 10) {
+    return 'Rating must be a whole number from 1 to 10';
+  }
+  if (typeof comment !== 'string' || comment.trim() === '') {
+    return 'Comment is required';
+  }
+  return null;
+}
+
+// POST /api/movies/:movieId/reviews  (signed in)
+router.post('/movies/:movieId/reviews', authenticate, async (req, res, next) => {
+  try {
+    const movieId = parseId(req.params.movieId);
+    if (movieId === null) {
+      return res.status(400).json({ error: 'Movie id must be a positive whole number' });
+    }
+
+    const { rating, comment } = req.body || {};
+    const problem = validateReviewBody(rating, comment);
+    if (problem) {
+      return res.status(400).json({ error: problem });
+    }
+
+    const movie = await Movie.findById(movieId);
+    if (!movie) {
+      return res.status(404).json({ error: 'Movie not found' });
+    }
+
+    const review = await Review.create(req.user.id, movieId, rating, comment.trim());
+    res.status(201).json(review);
+  } catch (err) {
+    if (err.code === 'ER_DUP_ENTRY') {
+      return res.status(409).json({
+        error: 'You have already reviewed this movie. Edit it with PUT /api/reviews/:id',
+      });
+    }
+    next(err);
+  }
+});
+
+
 module.exports = router;
