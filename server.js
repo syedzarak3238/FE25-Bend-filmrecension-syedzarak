@@ -7,6 +7,7 @@ app.use(express.json());
 // Step 2: temporary hardcoded route. Replace with MySQL in Step 5.
 app.use('/api/movies', require('./routes/movies'));
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api', require('./routes/reviews'));
 
 // TODO (later): mount routers, e.g.
 // app.use('/api/auth', require('./routes/auth'));
