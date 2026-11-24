@@ -53,5 +53,29 @@ router.post('/:movieId', async (req, res, next) => {
   }
 });
 
+// DELETE /api/watchlist/:movieId
+router.delete('/:movieId', async (req, res, next) => {
+  try {
+    const movieId = parseId(req.params.movieId);
+    if (movieId === null) {
+      return res.status(400).json({ error: 'Movie id must be a positive whole number' });
+    }
+
+    // user_id comes from the token, so users can only delete their own entries.
+    const [result] = await pool.query(
+      'DELETE FROM watchlist WHERE user_id = ? AND movie_id = ?',
+      [req.user.id, movieId]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Movie is not in your watchlist' });
+    }
+    res.json({ message: 'Movie removed from your watchlist' });
+  } catch (err) {
+    next(err);
+  }
+});
+
+
 
 module.exports = router;
