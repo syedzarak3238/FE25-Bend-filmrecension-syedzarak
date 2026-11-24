@@ -5,11 +5,7 @@ const app = express();
 app.use(express.json());
 
 // Step 2: temporary hardcoded route. Replace with MySQL in Step 5.
-app.get('/api/movies', (req, res) => {
-  res.json([
-    { id: 1, title: 'Test Movie', genre: 'Drama', release_year: 2020 },
-  ]);
-});
+app.use('/api/movies', require('./routes/movies'));
 
 // TODO (later): mount routers, e.g.
 // app.use('/api/auth', require('./routes/auth'));
