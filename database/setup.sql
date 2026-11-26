@@ -1,4 +1,3 @@
--- Creates everything from scratch. Run with:  mysql -u zarak -p < database/setup.sql
 DROP DATABASE IF EXISTS filmrecension;
 CREATE DATABASE filmrecension CHARACTER SET utf8mb4;
 USE filmrecension;
@@ -12,12 +11,10 @@ CREATE TABLE users (
 CREATE TABLE movies (
   id INT AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
-  genre VARCHAR(100),npm
+  genre VARCHAR(100),
   release_year INT
 );
 
--- DESIGN CHOICE: one review per user per movie (UNIQUE below).
--- Be ready to explain why, and what you'd change to allow several.
 CREATE TABLE reviews (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
@@ -37,7 +34,6 @@ CREATE TABLE watchlist (
   FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE CASCADE
 );
 
--- Sample movies (change or add your own)
 INSERT INTO movies (title, genre, release_year) VALUES
   ('Inception', 'Sci-Fi', 2010),
   ('The Godfather', 'Crime', 1972),

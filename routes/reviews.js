@@ -66,5 +66,36 @@ router.post('/movies/:movieId/reviews', authenticate, async (req, res, next) => 
   }
 });
 
+// PUT /api/reviews/:id  (owner only)
+router.put('/reviews/:id', authenticate, async (req, res, next) => {
+  try {
+    const id = parseId(req.params.id);
+    if (id === null) {
+      return res.status(400).json({ error: 'Review id must be a positive whole number' });
+    }
+
+    const review = await Review.findById(id);
+    if (!review) {
+      return res.status(404).json({ error: 'Review not found' });
+    }
+
+    if (!review.isOwnedBy(req.user.id)) {
+      return res.status(403).json({ error: 'You can only edit your own reviews' });
+    }
+
+    const { rating, comment } = req.body || {};
+    const problem = validateReviewBody(rating, comment);
+    if (problem) {
+      return res.status(400).json({ error: problem });
+    }
+
+    review.rating = rating;
+    review.comment = comment.trim();
+    await review.save();
+    res.json(review);
+  } catch (err) {
+    next(err);
+  }
+});
 
 module.exports = router;
